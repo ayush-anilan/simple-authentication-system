@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 // Nodemailer
@@ -11,6 +13,54 @@ const transporter = nodemailer.createTransport({
     pass: process.env.GMAIL_PASSWORD,
   },
 });
+
+// Middleware to verify JWT token
+exports.verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: "Token not provided" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    req.userId = decoded.userId;
+    next();
+  });
+};
+
+// SignIn
+exports.signin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // find user by email
+    const user = await User.findOne({ email });
+
+    // check if user exists
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    // Check if password is correct
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    // Create JWT token
+    const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
 
 // SignUp
 exports.signup = async (req, res) => {
@@ -27,11 +77,14 @@ exports.signup = async (req, res) => {
     const otpExpire = new Date();
     otpExpire.setMinutes(otpExpire.getMinutes() + 5); // OTP will expire after 5 minutes
 
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = new User({
       firstName,
       lastName,
       email,
-      password,
+      password: hashedPassword,
       otp,
       otpExpire,
     });
@@ -82,6 +135,24 @@ exports.verifyOtp = async (req, res) => {
 
     res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Get user information
+exports.getUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server Error" });
   }
 };
