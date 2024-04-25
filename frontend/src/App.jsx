@@ -6,7 +6,7 @@ import SignUpPage from './pages/SignUpPage'
 import IndexPage from './pages/IndexPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL
+axios.defaults.baseURL = https://highway-delite-task-api.vercel.app
 axios.defaults.withCredentials = true
 
 
