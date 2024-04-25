@@ -11,5 +11,11 @@ router.post("/verify-otp", userController.verifyOtp);
 router.post("/signin", userController.signin);
 // get user information
 router.get("/user", userController.verifyToken, userController.getUser);
+// Reset password
+router.post(
+  "/reset-password",
+  userController.verifyToken,
+  userController.resetPassword
+);
 
 module.exports = router;

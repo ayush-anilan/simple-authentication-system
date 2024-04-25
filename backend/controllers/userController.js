@@ -16,19 +16,22 @@ const transporter = nodemailer.createTransport({
 
 // Middleware to verify JWT token
 exports.verifyToken = (req, res, next) => {
-  const token = req.headers.authorization;
-
-  if (!token) {
-    return res.status(401).json({ message: "Token not provided" });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: "Invalid token" });
-    }
-    req.userId = decoded.userId;
+  // Get auth header value
+  const bearerHeader = req.headers["authorization"];
+  // Check if bearer is undefined
+  if (typeof bearerHeader !== "undefined") {
+    // split at the space
+    const bearer = bearerHeader.split(" ");
+    // Get token from array
+    const bearerToken = bearer[1];
+    // Set the token
+    req.token = bearerToken;
+    // Next middleware
     next();
-  });
+  } else {
+    // forbidden
+    res.sendStatus(403);
+  }
 };
 
 // SignIn
@@ -51,7 +54,7 @@ exports.signin = async (req, res) => {
     }
 
     // Create JWT token
-    const token = jwt.sign({ userID: user._id }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "1h",
     });
 
@@ -142,17 +145,68 @@ exports.verifyOtp = async (req, res) => {
 // Get user information
 exports.getUser = async (req, res) => {
   try {
-    const userId = req.userId;
-
-    const user = await User.findById(userId).select("-password");
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const token = req.token;
+    if (!token) {
+      return res.status(401).json({ message: "Token not provided" });
     }
 
-    res.status(200).json(user);
+    jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+      const userId = decoded.userId;
+
+      const user = await User.findById(userId).select("-password");
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json(user);
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
   }
+};
+
+// Reset password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const token = req.token;
+
+    if (!token) {
+      return res.status(401).json({ message: "Token not provided" });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+
+      const userId = decoded.userId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
+
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: "Invalid current password" });
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedNewPassword;
+      await user.save();
+
+      res.status(200).json({ message: "Password updated successfully" });
+    });
+  } catch (error) {}
 };
