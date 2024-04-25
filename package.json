@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "This is a simple authentication system with sign-in and sign-up functionality.",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon backend/server.js",
     "start": "node backend/server.js",
