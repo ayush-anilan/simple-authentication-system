@@ -18,7 +18,7 @@ const SignInPage = () => {
     const handleSignIn = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post('/signin', {
+            const response = await axios.post('/users/signin', {
                 email,
                 password
             })

@@ -12,7 +12,7 @@ const IndexPage = () => {
             try {
                 const token = localStorage.getItem('token')
                 if (!token) return
-                const response = await axios.get('/user', {
+                const response = await axios.get('/users/user', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

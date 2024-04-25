@@ -17,7 +17,7 @@ const ResetPasswordPage = () => {
         }
         try {
             const token = localStorage.getItem('token')
-            const response = await axios.post('/reset-password', {
+            const response = await axios.post('/users/reset-password', {
                 currentPassword,
                 newPassword
             }, {

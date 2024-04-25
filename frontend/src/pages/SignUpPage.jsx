@@ -28,7 +28,7 @@ const SignUpPage = () => {
 
     const sendOTP = async () => {
         try {
-            const response = await axios.post('/signup', {
+            const response = await axios.post('/users/signup', {
                 firstName,
                 lastName,
                 email,
@@ -45,7 +45,7 @@ const SignUpPage = () => {
 
     const verifyOTP = async () => {
         try {
-            const response = await axios.post('/verify-otp', {
+            const response = await axios.post('/users/verify-otp', {
                 email,
                 otp
             })
