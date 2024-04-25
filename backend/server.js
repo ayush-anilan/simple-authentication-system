@@ -17,7 +17,7 @@ async function main() {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: ["https://highway-delite-task-frontend-two.vercel.app/"], methods: ["POST", "GET"], credentials: true }));
+app.use(cors({ origin: "https://highway-delite-task-frontend-two.vercel.app", methods: ["POST", "GET"], credentials: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
