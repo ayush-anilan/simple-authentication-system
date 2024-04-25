@@ -18,8 +18,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: "https://highway-delite-task-frontend-two.vercel.app",
-    methods: ["POST", "GET"],
+    origin: true,
     credentials: true,
   })
 );
