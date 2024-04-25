@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
+import axios from 'axios'
 import SignInPage from './pages/SignInPage'
 import SignUpPage from './pages/SignUpPage'
 import IndexPage from './pages/IndexPage'
