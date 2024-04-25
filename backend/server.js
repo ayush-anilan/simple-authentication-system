@@ -26,6 +26,10 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.get("/", (req, res) => {
+  res.json("Hello");
+});
+
 // Route
 const userRouter = require("./routes/users");
 app.use("/", userRouter);
