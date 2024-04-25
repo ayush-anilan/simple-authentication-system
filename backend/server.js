@@ -14,8 +14,6 @@ async function main() {
   console.log("Connected to database");
 }
 
-const __dirname = path.resolve();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -27,6 +25,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
