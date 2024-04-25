@@ -26,12 +26,12 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const __dirname = path.resolve();
+const appDir = path.dirname(require.main.filename);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
+app.use(express.static(path.join(appDir, "/frontend/dist")));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+  res.sendFile(path.join(appDir, "frontend", "dist", "index.html"));
 });
 
 app.get("/", (req, res) => {
