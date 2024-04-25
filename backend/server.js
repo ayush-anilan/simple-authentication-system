@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 require("dotenv").config();
 
 // Setup mongoose connection
@@ -24,8 +23,8 @@ app.use(
     credentials: true,
   })
 );
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Route
 const userRouter = require("./routes/users");
