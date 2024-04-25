@@ -52,6 +52,7 @@ const SignUpPage = () => {
             if (response.status === 200) {
                 navigate("/")
                 setError('')
+                window.alert('Sign up successful')
             }
         } catch (error) {
             setError(error.response.data.message)
