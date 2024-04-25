@@ -32,6 +32,10 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
+// Route
+const userRouter = require("./routes/users");
+app.use("/api/users", userRouter);
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
 });
@@ -39,10 +43,6 @@ app.get("*", (req, res) => {
 app.get("/", (req, res) => {
   res.json("Hello");
 });
-
-// Route
-const userRouter = require("./routes/users");
-app.use("/users", userRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
